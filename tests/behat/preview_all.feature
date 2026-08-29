@@ -80,3 +80,11 @@ Feature: Preview every question in a category as a quiz
     And I press "Apply"
     Then I should see "Name a primary colour"
     And I should not see "The sky is blue"
+
+  Scenario: Each question has an Edit question link back to its editor
+    Given I am on the "Qbank 1" "core_question > question bank" page logged in as "teacher1"
+    And I apply question bank filter "Category" with value "Parent cat"
+    And I reload the page
+    And I select "Preview all" from the "Question bank tertiary navigation" singleselect
+    Then "Edit question" "link" should exist
+    And "//a[contains(@href, '/question/bank/editquestion/question.php') and contains(@href, 'returnurl')]" "xpath_element" should exist

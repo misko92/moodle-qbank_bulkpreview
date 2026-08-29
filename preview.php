@@ -108,15 +108,18 @@ if (!empty($pagequestionids)) {
     }
 }
 
-// A single context-level check covers everyone with viewall; only viewmine-restricted
-// users need the per-question filter below.
+// A single context-level check covers everyone with viewall / editall; only
+// viewmine / editmine restricted users need the per-question filter below.
 $canviewall = has_capability('moodle/question:viewall', $catcontext);
+$caneditall = has_capability('moodle/question:editall', $catcontext);
+$showeditlinks = \core\plugininfo\qbank::is_plugin_enabled('qbank_editquestion');
 
 // Build an in-memory question usage and start every question. Nothing is saved.
 $quba = question_engine::make_questions_usage_by_activity('qbank_bulkpreview', $catcontext);
 $quba->set_preferred_behaviour('deferredfeedback');
 
 $slots = [];
+$slotquestions = [];
 foreach ($pagequestionids as $questionid) {
     if (
         !isset($questiondata[$questionid]) ||
@@ -139,6 +142,7 @@ foreach ($pagequestionids as $questionid) {
         continue;
     }
     $slots[] = $slot;
+    $slotquestions[$slot] = $question;
 }
 
 $answerswarning = false;
@@ -252,9 +256,29 @@ echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $thispageurl);
 // Render the questions inside an inert form so form-based question types display correctly.
 echo html_writer::start_tag('form', ['action' => '#', 'method' => 'post', 'onsubmit' => 'return false;',
         'class' => 'qbank-bulkpreview']);
+$editreturnurl = (new moodle_url($thispageurl, ['page' => $page]))->out_as_local_url(false);
 $displaynumber = $page * $perpage + 1;
 foreach ($slots as $slot) {
+    echo html_writer::start_div('qbank-bulkpreview-item');
     echo $quba->render_question($slot, $options, (string) $displaynumber);
+
+    $question = $slotquestions[$slot];
+    if ($showeditlinks && ($caneditall || question_has_capability_on($question, 'edit'))) {
+        $editurl = new moodle_url('/question/bank/editquestion/question.php', [
+            'id' => $question->id,
+            'cmid' => $cmid,
+            'returnurl' => $editreturnurl,
+        ]);
+        echo html_writer::div(
+            html_writer::link(
+                $editurl,
+                get_string('editquestion', 'question'),
+                ['class' => 'btn btn-sm btn-link', 'target' => '_blank', 'rel' => 'noopener']
+            ),
+            'qbank-bulkpreview-edit text-end small mb-3'
+        );
+    }
+    echo html_writer::end_div();
     $displaynumber++;
 }
 echo html_writer::end_tag('form');

@@ -10,6 +10,10 @@ current category exactly as it would appear inside a quiz.
 * A **category picker** in the filter bar (every category in the bank, indented,
   with question counts) lets you jump straight to any category without going back
   to the question bank. The starting category is whatever was selected there.
+* Each question carries an **Edit question** link (opens in a new tab, returns to
+  the preview) when the user can edit it — `moodle/question:editall` in the
+  context, or `edit` capability on that individual question. Hidden entirely for
+  view-only users or if `qbank_editquestion` is disabled.
 * Paginated (20 per page by default, `perpage` up to 100). Only the current
   page's IDs are read from the database; the count is a single `COUNT(1)`.
 * Bulk-loads the page's question definitions with `question_load_questions()`
