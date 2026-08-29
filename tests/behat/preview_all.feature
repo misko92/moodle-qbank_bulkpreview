@@ -69,3 +69,14 @@ Feature: Preview every question in a category as a quiz
     And I reload the page
     When I select "Preview all" from the "Question bank tertiary navigation" singleselect
     Then I should see "There are no questions in this category"
+
+  Scenario: The category picker switches which category is previewed
+    Given I am on the "Qbank 1" "core_question > question bank" page logged in as "teacher1"
+    And I apply question bank filter "Category" with value "Parent cat"
+    And I reload the page
+    And I select "Preview all" from the "Question bank tertiary navigation" singleselect
+    And I should see "The sky is blue"
+    When I set the field "Category to preview" to "Child cat"
+    And I press "Apply"
+    Then I should see "Name a primary colour"
+    And I should not see "The sky is blue"

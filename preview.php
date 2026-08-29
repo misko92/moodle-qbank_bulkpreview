@@ -63,6 +63,12 @@ if (!in_array($category->contextid, $allowedcontextids)) {
 // the filter form carry it explicitly regardless of how it was passed in.
 $catparam = $category->id . ',' . $category->contextid;
 
+// Every category in this question bank, indented and with question counts, for the
+// picker in the filter bar. Keys are "id,contextid"; the popup-form shape groups by
+// context in the way html_writer::select() expects for optgroups.
+$categoryoptions = (new \core_question\output\question_category_selector())
+    ->question_category_options($contexts->all(), false, 0, true);
+
 // Must be allowed to look at questions in this context at all. Per-question
 // viewmine/viewall filtering happens in the loop below.
 if (!has_any_capability(['moodle/question:viewall', 'moodle/question:viewmine'], $catcontext)) {
@@ -197,11 +203,20 @@ echo html_writer::start_tag('form', ['method' => 'get', 'action' => $thispageurl
 // Hidden defaults so an unchecked box submits an explicit 0 (the checkbox below, when
 // ticked, overrides these because it appears later in the query string).
 foreach (
-    ['cmid' => $cmid, 'cat' => $catparam, 'perpage' => $perpage,
-        'recurse' => 0, 'showcorrect' => 0] as $name => $value
+    ['cmid' => $cmid, 'perpage' => $perpage, 'recurse' => 0, 'showcorrect' => 0] as $name => $value
 ) {
     echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $name, 'value' => $value]);
 }
+echo html_writer::div(
+    html_writer::label(
+        get_string('previewcategory', 'qbank_bulkpreview'),
+        'id_bulkpreviewcat',
+        false,
+        ['class' => 'me-1']
+    ) .
+    html_writer::select($categoryoptions, 'cat', $catparam, false, ['id' => 'id_bulkpreviewcat']),
+    'form-group'
+);
 echo html_writer::div(
     html_writer::checkbox('recurse', 1, (bool) $recurse, get_string('recurse', 'qbank_bulkpreview')),
     'form-check'

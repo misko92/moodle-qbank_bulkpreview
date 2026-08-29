@@ -7,6 +7,9 @@ current category exactly as it would appear inside a quiz.
 
 * Lists the latest *ready* version of every question in the selected category
   (optionally including subcategories).
+* A **category picker** in the filter bar (every category in the bank, indented,
+  with question counts) lets you jump straight to any category without going back
+  to the question bank. The starting category is whatever was selected there.
 * Paginated (20 per page by default, `perpage` up to 100). Only the current
   page's IDs are read from the database; the count is a single `COUNT(1)`.
 * Bulk-loads the page's question definitions with `question_load_questions()`

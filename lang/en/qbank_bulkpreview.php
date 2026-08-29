@@ -30,6 +30,7 @@ $string['filteroptions'] = 'Preview options';
 $string['noquestions'] = 'There are no questions in this category.';
 $string['pluginname'] = 'Bulk question preview';
 $string['previewall'] = 'Preview all';
+$string['previewcategory'] = 'Category to preview';
 $string['privacy:metadata'] = 'The Bulk question preview plugin does not store any personal data.';
 $string['recurse'] = 'Include subcategories';
 $string['showcorrect'] = 'Show correct answers';
