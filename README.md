@@ -21,9 +21,11 @@ current category exactly as it would appear inside a quiz.
   (the path `mod_quiz` uses) rather than one load per question.
 * Builds a single in-memory `question_usage_by_activity` with the
   `deferredfeedback` behaviour, starts every question and renders it read-only.
-* Optional **Show correct answers** mode finishes each question with an empty
-  response so model answers and feedback are revealed. Done per question, so one
-  type that cannot finish this way does not blank the rest of the page.
+* Optional **Show correct answers** mode submits the model answer into each
+  question (like the single-question preview's "Fill in correct responses") and
+  finishes it, so the right option shows filled in and marked, plus feedback.
+  Questions with no single correct response (e.g. essay) just show their feedback.
+  Done per question, so one that cannot do this does not stop the rest.
 
 ## What it does not do
 

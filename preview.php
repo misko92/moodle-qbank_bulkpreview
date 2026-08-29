@@ -149,11 +149,17 @@ $answerswarning = false;
 if (!empty($slots)) {
     $quba->start_all_questions();
     if ($showcorrect) {
-        // Finishing with an empty response lets each question reveal its model
-        // answer and feedback. Done per question so one type that cannot finish
-        // this way does not blank the answers for the rest of the page.
+        // Submit the model answer into each question (the same thing the single
+        // question preview's "Fill in correct responses" does) then finish it, so
+        // the correct option shows filled in and marked, not just described in a
+        // feedback line. Done per question so one that has no single correct
+        // response (e.g. essay) does not stop the rest.
         foreach ($slots as $slot) {
             try {
+                $correctresponse = $quba->get_correct_response($slot);
+                if ($correctresponse !== null) {
+                    $quba->process_action($slot, $correctresponse);
+                }
                 $quba->finish_question($slot);
             } catch (Exception $e) {
                 $answerswarning = true;
