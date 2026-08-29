@@ -259,26 +259,41 @@ echo html_writer::start_tag('form', ['action' => '#', 'method' => 'post', 'onsub
 $editreturnurl = (new moodle_url($thispageurl, ['page' => $page]))->out_as_local_url(false);
 $displaynumber = $page * $perpage + 1;
 foreach ($slots as $slot) {
-    echo html_writer::start_div('qbank-bulkpreview-item');
-    echo $quba->render_question($slot, $options, (string) $displaynumber);
-
+    $questionhtml = $quba->render_question($slot, $options, (string) $displaynumber);
     $question = $slotquestions[$slot];
+
+    $editlink = '';
     if ($showeditlinks && ($caneditall || question_has_capability_on($question, 'edit'))) {
         $editurl = new moodle_url('/question/bank/editquestion/question.php', [
             'id' => $question->id,
             'cmid' => $cmid,
             'returnurl' => $editreturnurl,
         ]);
-        echo html_writer::div(
+        $editlink = html_writer::div(
             html_writer::link(
                 $editurl,
-                get_string('editquestion', 'question'),
-                ['class' => 'btn btn-sm btn-link', 'target' => '_blank', 'rel' => 'noopener']
+                $OUTPUT->pix_icon('t/edit', '') . get_string('editquestion', 'question'),
+                ['target' => '_blank', 'rel' => 'noopener']
             ),
-            'qbank-bulkpreview-edit text-end small mb-3'
+            'qbank-bulkpreview-edit small mt-2'
         );
     }
-    echo html_writer::end_div();
+
+    if ($editlink !== '') {
+        // Splice the link into the question's own info column, just after the
+        // version badge. If core ever changes that markup, fall back to placing
+        // it below the whole question.
+        $spliced = preg_replace(
+            '~(</div>\s*<div class="content">)~',
+            $editlink . '$1',
+            $questionhtml,
+            1,
+            $count
+        );
+        $questionhtml = $count ? $spliced : $questionhtml . $editlink;
+    }
+
+    echo html_writer::div($questionhtml, 'qbank-bulkpreview-item');
     $displaynumber++;
 }
 echo html_writer::end_tag('form');
